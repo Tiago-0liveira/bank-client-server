@@ -1,3 +1,9 @@
 {
-	"codam-norminette-3.disable":"true",
+	"codam-norminette-3.disable": "true",
+	"files.associations": {
+		"*.c": "c",
+		"cliente.h": "c",
+		"servidor.h": "c",
+		"common.h": "c"
+	},
 }
