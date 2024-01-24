@@ -160,6 +160,7 @@ void	*run_pedido(void *arg)
 		resposta.status = STATUS_OK;
 		resposta.saldo = deposito(&pedidoThreaded->ServerManager->sharedMemory, pedidoThreaded->pedido->numero_conta, pedidoThreaded->pedido->montante);
 		pthread_mutex_unlock(&pedidoThreaded->ServerManager->mutex);
+		usleep(CRITIC_WAIT_TIME_IMILLIS);
 		break;
 	case TRANSFERENCIA:
 		pthread_mutex_lock(&pedidoThreaded->ServerManager->mutex);
@@ -176,7 +177,7 @@ void	*run_pedido(void *arg)
 		} else {
 			resposta.status = STATUS_OK;			
 			resposta.saldo = transferencia(&pedidoThreaded->ServerManager->sharedMemory, pedidoThreaded->pedido->numero_conta, pedidoThreaded->pedido->conta_destino, pedidoThreaded->pedido->montante);
-			usleep(CRITIC_WAIT_TIME_IMILLIS);// 100 milliseconds
+			usleep(CRITIC_WAIT_TIME_IMILLIS);
 		}
 		pthread_mutex_unlock(&pedidoThreaded->ServerManager->mutex);
 		break;
@@ -195,6 +196,7 @@ void	*run_pedido(void *arg)
 		} else {
 			resposta.status = STATUS_OK;
 			resposta.saldo = levantamento(&pedidoThreaded->ServerManager->sharedMemory, pedidoThreaded->pedido->numero_conta, pedidoThreaded->pedido->montante);
+			usleep(CRITIC_WAIT_TIME_IMILLIS);
 		}
 		break;
 	default:
@@ -346,7 +348,6 @@ void	init_banco(Banco *banco, ServerManager *ServerManager)
 	sigaction(SIGUSR1, &s_sigaction, NULL);
 	sigaction(SIGUSR2, &s_sigaction, NULL);
 	sigaction(SIGINT, &s_sigaction, NULL);
-	sigaction(SIGALRM, &s_sigaction, NULL);
 }
 
 bool	init_bancoManager(BancoManager *bancoManager)

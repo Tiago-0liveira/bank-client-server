@@ -100,9 +100,7 @@ Pedido	*make_pedido(ClientManager *ClientManager, char *msg)
 
 void	send_pedido(ClientManager *ClientManager, Pedido *pedido)
 {
-	//printf("pedido: tipo:%d|nc:%d|m:%.3f|cd:%d\n", pedido->tipo, pedido->numero_conta, pedido->montante, pedido->conta_destino);
 	ssize_t nbytes = write(ClientManager->fifo_c2s, pedido, sizeof(Pedido));
-	//printf("Pedido enviado!\n");
 	if (nbytes == -1) {
     	perror("Error writing to FIFO");
 	}
@@ -138,10 +136,8 @@ void	*answer_thread(void *arg)
 	int nbytes;
 
 	pthread_mutex_lock(&ClientManager->mutex);
-	//printf("thread:132|mutex locked\n");
 	while (ClientManager->running) {
 		pthread_mutex_unlock(&ClientManager->mutex);
-		//printf("thread:135|mutex unlocked\n");
 		nbytes = read(ClientManager->fifo_s2c, &resposta, sizeof(Resposta));
 		if (nbytes == -1)
 		{
@@ -162,7 +158,7 @@ void	*answer_thread(void *arg)
 				switch (resposta.pedido.tipo)
 				{
 				case DEPOSITO:
-					printf("Depósito na conta %d de %.3f, saldo atual: %.3f\n", resposta.pedido.conta_destino, resposta.pedido.montante, resposta.saldo);
+					printf("Depósito na conta %d de %.3f, saldo atual: %.3f\n", resposta.pedido.numero_conta, resposta.pedido.montante, resposta.saldo);
 					break;
 				case TRANSFERENCIA:
 					printf("Transferência da conta %d para a conta %d de %.3f, saldo atual: %.3f\n", resposta.pedido.numero_conta, resposta.pedido.conta_destino, resposta.pedido.montante, resposta.saldo);
@@ -192,18 +188,13 @@ void	*answer_thread(void *arg)
 				break;
 		}
 		pthread_mutex_lock(&ClientManager->mutex);
-		//printf("thread:181|mutex locked\n");
 	}
-	//printf("thread:198|mutex locked\n");
 	pthread_mutex_unlock(&ClientManager->mutex);
-	//printf("thread:202|mutex unlocked\n");
 	pthread_exit(NULL);
 }
 
 bool	validar_pedido(Pedido *pedido)
 {
-	//printf("validar_pedido: pedido->numero_conta: %d\n", pedido->numero_conta);
-	//printf("validar_pedido: pedido->conta_destino: %d\n", pedido->conta_destino);
 	if (pedido->numero_conta < 0 || pedido->numero_conta >= NUM_ACCOUNTS)
 		return false;
 	if (pedido->conta_destino < 0 || pedido->conta_destino >= NUM_ACCOUNTS)
